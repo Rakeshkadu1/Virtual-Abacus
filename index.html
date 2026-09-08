@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Virtual Abacus - Practice Mental Math</title>
+
+<style>
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef3df;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+#mainHeader {
+    width: 100%;
+    transition:
+        max-height 0.35s ease,
+        opacity 0.35s ease,
+        transform 0.35s ease;
+}
+
+#mainHeader.header-hidden {
+    display: none;
+}
+
+
+/* =========================================================
+   TOP NAVIGATION
+   ========================================================= */
+
+.top-header {
+    width: 100%;
+    height: 118px;
+    background: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px 48px;
+
+    position: relative;
+    z-index: 10;
+}
+
+.logo-area img {
+    width: 80px;
+    height: auto;
+    display: block;
+}
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.header-btn {
+    height: 70px;
+    min-width: 130px;
+
+    padding: 0 28px;
+
+    border-radius: 8px;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background: white;
+    border: 3px solid #26384d;
+
+    transition: 0.2s;
+}
+
+.header-btn:hover {
+    transform: translateY(-1px);
+}
+
+.signup-btn {
+    background: #ed7d1a;
+    color: white;
+    border-color: #ed7d1a;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero-section {
+    width: 100%;
+
+    min-height: 410px;
+
+    background:
+        linear-gradient(
+            105deg,
+            #93e36c 0%,
+            #c2f58b 28%,
+            #b9ef82 100%
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 55px 30px;
+}
+
+.hero-content {
+    max-width: 1400px;
+    width: 100%;
+}
+
+.hero-title {
+    margin: 0 0 35px;
+
+    font-size: clamp(45px, 5vw, 78px);
+
+    line-height: 1.05;
+
+    font-weight: 800;
+
+    color: #17172e;
+}
+
+.hero-subtitle {
+    margin: 0 auto;
+
+    max-width: 1250px;
+
+    font-size: clamp(22px, 2vw, 30px);
+
+    line-height: 1.55;
+
+    color: #4f4f55;
+}
+
+
+/* =========================================================
+   HIDE / SHOW HEADER BUTTON
+   ========================================================= */
+
+.header-control {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    right: auto;
+    z-index: 999999;
+}
+
+#hideHeaderBtn,
+#showHeaderBtn {
+
+    border: 2px solid #26384d;
+
+    background: #ffffff;
+
+    color: #17202a;
+
+    border-radius: 7px;
+
+    padding: 10px 18px;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.18);
+}
+
+#hideHeaderBtn:hover,
+#showHeaderBtn:hover {
+    background: #f1f1f1;
+}
+
+#showHeaderBtn {
+    display: none;
+}
+
+
+/* =========================================================
+   50 / 50 SCHOOL DISPLAY
+   ========================================================= */
+
+.school-workspace {
+    width: 100%;
+    min-height: calc(100vh - 1px);
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: #eef3df;
+}
+
+.abacus-half {
+    width: 60%;
+    min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 3px solid #867563;
+}
+
+.pdf-half {
+    width: 40%;
+    min-width: 0;
+    min-height: 100%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.pdf-header {
+    height: 54px;
+    flex: 0 0 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #ffffff;
+    border-bottom: 2px solid #d0d0d0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.pdf-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.pdf-open-btn {
+    flex: 0 0 auto;
+    border: 1px solid #26384d;
+    background: #ffffff;
+    color: #17202a;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pdf-open-btn:hover {
+    background: #f1f1f1;
+}
+
+#schoolPdf {
+    width: 100%;
+    height: calc(100vh - 55px);
+    min-height: 600px;
+    border: 0;
+    display: block;
+    background: #ffffff;
+}
+
+/* Header hidden: use the complete screen for the 50/50 workspace. */
+body.header-hidden-mode .school-workspace {
+    min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+    .school-workspace {
+        flex-direction: column;
+    }
+
+    .abacus-half,
+    .pdf-half {
+        width: 100%;
+    }
+
+    .abacus-half {
+        border-bottom: 3px solid #867563;
+    }
+
+    .pdf-half {
+        display: block;
+        min-height: 80vh;
+        background: #fff;
+    }
+
+    #schoolPdf {
+        display: block;
+        width: 100%;
+        height: 80vh;
+        min-height: 600px;
+        border: 0;
+    }
+}
+
+/* =========================================================
+   ABACUS AREA
+   ========================================================= */
+
+.abacus-page {
+    width: 100%;
+
+    padding:
+        35px
+        clamp(12px, 3vw, 50px)
+        50px;
+}
+
+
+/* =========================================================
+   INSTRUCTIONS
+   ========================================================= */
+
+.instructions {
+    text-align: center;
+
+    font-size: 22px;
+
+    color: #303030;
+
+    margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.controls {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 45px;
+
+    flex-wrap: wrap;
+}
+
+.controls label {
+    font-size: 22px;
+
+    font-weight: 600;
+
+    color: #333;
+}
+
+#rodCount {
+
+    width: 85px;
+
+    height: 58px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    text-align: center;
+
+    font-size: 21px;
+
+    outline: none;
+}
+
+.control-btn {
+
+    height: 58px;
+
+    padding: 0 34px;
+
+    border-radius: 7px;
+
+    border: 3px solid #ed7d1a;
+
+    background: #ffffff;
+
+    color: #111;
+
+    font-size: 21px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.control-btn:hover {
+
+    background: #fff4e9;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   VALUE
+   ========================================================= */
+
+.value-box {
+
+    text-align: center;
+
+    margin-bottom: 25px;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: #222;
+}
+
+
+/* =========================================================
+   ABACUS OUTER BOX
+   ========================================================= */
+
+#abacus {
+
+    width: 100%;
+
+    max-width: 1800px;
+
+    margin: 0 auto;
+
+    background: #aeb2c4;
+
+    border: 18px solid #867563;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+
+/* =========================================================
+   UPPER / LOWER
+   ========================================================= */
+
+.upper-section-container,
+.lower-section-container {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(var(--rod-count), minmax(0, 1fr));
+
+    position: relative;
+
+    background: #aeb2c4;
+}
+
+.upper-section-container {
+
+    min-height: 100px;
+}
+
+.lower-section-container {
+
+    min-height: 220px;
+}
+
+
+/* =========================================================
+   COLUMNS
+   ========================================================= */
+
+.upper-column,
+.lower-column {
+
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+/* =========================================================
+   RODS
+   ========================================================= */
+
+.rod {
+
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 3px;
+
+    background: #f4c400;
+
+    z-index: 1;
+}
+
+.upper-column .rod {
+
+    top: 0;
+
+    bottom: 0;
+}
+
+.lower-column .rod {
+
+    top: 0;
+
+    bottom: 0;
+}
+
+
+/* =========================================================
+   BEADS
+   ========================================================= */
+
+.bead {
+
+    width: 68px;
+
+    height: 40px;
+
+    max-width: 90%;
+
+    position: relative;
+
+    z-index: 5;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.18s ease,
+        filter 0.18s ease;
+
+    clip-path: polygon(
+        50% 0%,
+        100% 50%,
+        50% 100%,
+        0% 50%
+    );
+
+    flex-shrink: 0;
+}
+
+.bead:hover {
+
+    filter:
+        brightness(1.08)
+        drop-shadow(
+            0 2px 3px
+            rgba(0,0,0,0.25)
+        );
+}
+
+
+/* =========================================================
+   UPPER BEAD
+   ========================================================= */
+
+.upper-column .bead {
+
+    position: absolute;
+
+    top: 10px;
+
+    transform: translateY(0);
+}
+/* Desktop */
+.upper-column .bead.active{
+    transform: translateY(
+        48px);
+    }    
+ /* Mobile */
+
+@media (max-width: 600px) {  
+    .upper-column .bead.active {
+        transform: translateY(18px);
+    }     
+    .lower-column .bead.active {
+        transform: translateY(-20px);
+    }    
+}
+
+
+/* =========================================================
+   LOWER BEADS
+   ========================================================= */
+
+.lower-column {
+
+    flex-direction: column;
+
+    justify-content: flex-start;
+
+    padding-top: 62px;
+
+    gap: 0;
+}
+
+.lower-column .bead {
+
+    margin-top: -1px;
+
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   ACTIVE LOWER BEADS
+   ========================================================= */
+
+.lower-column .bead.active {
+    transform: translateY(-62px);
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.divider-bar {
+
+    width: 100%;
+
+    height: 22px;
+
+    background: #867563;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(var(--rod-count), minmax(0, 1fr));
+
+    position: relative;
+
+    z-index: 20;
+}
+
+
+/* =========================================================
+   DIVIDER MARKER
+   ========================================================= */
+
+.divider-marker {
+
+    height: 100%;
+
+    position: relative;
+}
+
+
+/* =========================================================
+   WHITE DOT
+   IMPORTANT:
+   DOT IS BASED ON DISPLAY POSITION,
+   NOT ROD NUMBER.
+   ========================================================= */
+
+.divider-marker.has-dot::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 19px;
+
+    height: 6px;
+
+    background: #ffffff;
+
+    border-radius: 2px;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    z-index: 30;
+}
+
+
+/* =========================================================
+   HIDE HEADER MODE
+   ========================================================= */
+
+body.header-hidden-mode .abacus-page {
+
+    padding-top: 25px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .top-header {
+
+        height: 90px;
+
+        padding: 10px 20px;
+    }
+
+    .logo-area img {
+
+        width: 60px;
+    }
+
+    .header-btn {
+
+        height: 50px;
+
+        min-width: 95px;
+
+        padding: 0 16px;
+
+        font-size: 17px;
+    }
+
+    .hero-section {
+
+        min-height: 300px;
+
+        padding: 40px 20px;
+    }
+
+    .hero-title {
+
+        font-size: 44px;
+
+        margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+
+        font-size: 20px;
+    }
+
+    .abacus-page {
+
+        padding-left: 10px;
+
+        padding-right: 10px;
+    }
+
+    #abacus {
+
+        border-width: 10px;
+    }
+
+    .bead {
+
+        width: 48px;
+
+        height: 30px;
+    }
+
+    .lower-section-container {
+
+        min-height: 180px;
+    }
+
+    .upper-section-container {
+
+        min-height: 80px;
+    }
+
+    .controls {
+
+        gap: 10px;
+    }
+
+    .controls label {
+
+        font-size: 18px;
+    }
+
+    .control-btn {
+
+        padding: 0 18px;
+
+        font-size: 17px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .top-header {
+
+        height: 72px;
+
+        padding: 8px 12px;
+    }
+
+    .logo-area img {
+
+        width: 50px;
+    }
+
+    .header-buttons {
+
+        gap: 7px;
+    }
+
+    .header-btn {
+
+        height: 42px;
+
+        min-width: 75px;
+
+        padding: 0 10px;
+
+        font-size: 14px;
+    }
+
+    .hero-section {
+
+        min-height: 230px;
+
+        padding: 30px 15px;
+    }
+
+    .hero-title {
+
+        font-size: 32px;
+    }
+
+    .hero-subtitle {
+
+        font-size: 16px;
+    }
+
+    .instructions {
+
+        font-size: 17px;
+    }
+
+    .controls label {
+
+        font-size: 16px;
+    }
+
+    #rodCount {
+
+        width: 65px;
+
+        height: 45px;
+
+        font-size: 17px;
+    }
+
+    .control-btn {
+
+        height: 45px;
+
+        font-size: 15px;
+
+        padding: 0 14px;
+    }
+
+    #abacus {
+
+        border-width: 6px;
+    }
+
+    .bead {
+
+        width: 34px;
+
+        height: 24px;
+    }
+
+    .divider-bar {
+
+        height: 16px;
+    }
+
+    .divider-marker.has-dot::after {
+
+        width: 11px;
+
+        height: 4px;
+    }
+
+    .lower-section-container {
+
+        min-height: 145px;
+    }
+
+    .upper-section-container {
+
+        min-height: 65px;
+    }
+
+    .lower-column {
+
+        padding-top: 45px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
+
+<div id="mainHeader">
+
+    <!-- TOP HEADER -->
+
+    <header class="top-header">
+
+        <div class="logo-area">
+
+            <!--
+                If you have your own logo,
+                change this image path.
+            -->
+
+            <img
+                src="logo.png"
+                alt="Logo"
+                onerror="this.style.display='none';"
+            >
+
+        </div>
+
+
+        <div class="header-buttons">
+
+            <button
+                class="header-btn"
+                type="button"
+                onclick="alert('Login option')">
+
+                Login
+
+            </button>
+
+
+            <button
+                class="header-btn signup-btn"
+                type="button"
+                onclick="alert('Sign Up option')">
+
+                Sign Up
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- HERO -->
+
+    <section class="hero-section">
+
+        <div class="hero-content">
+
+            <h1 class="hero-title">
+
+                Genius Abacus Center Virtual
+
+            </h1>
+
+
+            <p class="hero-subtitle">
+
+                Engage with an interactive learning tool
+                that builds speed, accuracy, and mental
+                agility — anytime, anywhere.
+
+            </p>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =====================================================
+     HEADER SHOW/HIDE BUTTON
+     ===================================================== -->
+
+<div class="header-control">
+
+    <button
+        id="hideHeaderBtn"
+        type="button">
+
+        Hide Header
+
+    </button>
+
+
+    <button
+        id="showHeaderBtn"
+        type="button">
+
+        Show Header
+
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     50 / 50 SCHOOL DISPLAY
+     LEFT  = VIRTUAL ABACUS
+     RIGHT = 1st_Level_class_Book.pdf
+     ===================================================== -->
+
+<div class="school-workspace">
+
+    <section class="abacus-half">
+
+<main class="abacus-page">
+
+
+    <!-- INSTRUCTION -->
+
+    <!-- <div class="instructions">
+
+        Click or tap a bead to move it.
+
+    </div> -->
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <label for="rodCount">
+
+            Rods/Columns:
+
+        </label>
+
+
+        <input
+            id="rodCount"
+            type="number"
+            min="1"
+            max="17"
+            value="17"
+        >
+
+
+        <button
+            id="resetBtn"
+            class="control-btn"
+            type="button">
+
+            Reset
+
+        </button>
+
+
+        <!-- <button
+            id="clearBtn"
+            class="control-btn"
+            type="button">
+
+            Clear Rods
+
+        </button> -->
+
+    </div>
+
+
+    <!-- ABACUS -->
+
+    <div id="abacus"></div>
+
+
+</main>
+
+    </section>
+
+    <!-- =================================================
+         PDF PANEL
+         Keep this PDF in the same folder as index.html:
+         1st_Level_class_Book.pdf
+         ================================================= -->
+
+    <section class="pdf-half">
+
+        <div class="pdf-header">
+
+            <span class="pdf-title">
+                1st Level Class Book
+            </span>
+
+            <button
+                class="pdf-open-btn"
+                type="button"
+                onclick="openSchoolPdf()">
+                Open PDF
+            </button>
+
+        </div>
+
+        <iframe
+            id="schoolPdf"
+            title="1st Level Class Book PDF"
+            src="1st_Level_class_Book.pdf#page=1&view=FitH">
+        </iframe>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   VIRTUAL ABACUS
+   ========================================================= */
+
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+let columns = 17;
+
+let state = [];
+
+let resetMode = true;
+
+
+/* =========================================================
+   COLOR SEQUENCE
+   IMPORTANT:
+   COLOR IS BASED ON ROD NUMBER.
+   ========================================================= */
+
+const beadColors = [
+
+    '#F080B8', // 1  Pink
+    '#18B866', // 2  Green
+    '#FFFFFF', // 3  White
+    '#1976D2', // 4  Blue
+    '#F5D000', // 5  Yellow
+    '#D92B20', // 6  Red
+    '#1976D2', // 7  Blue
+    '#D92B20', // 8  Red
+    '#F5D000', // 9  Yellow
+    '#F080B8', // 10 Pink
+    '#FFFFFF', // 11 White
+    '#18B866', // 12 Green
+    '#F080B8', // 13 Pink
+    '#18B866', // 14 Green
+    '#FFFFFF', // 15 White
+    '#F5D000', // 16 Yellow
+    '#D92B20'  // 17 Red
+
+];
+
+
+/* =========================================================
+   RESET ORDER
+   ========================================================= */
+
+const resetRodOrder = [
+
+    15,
+    14,
+    10,
+    9,
+    8,
+
+    4,
+    3,
+    2,
+    1,
+
+    5,
+    6,
+    7,
+
+    11,
+    12,
+    13,
+
+    16,
+    17
+
+];
+
+
+/* =========================================================
+   GET ROD ORDER
+   ========================================================= */
+
+function getRodOrder() {
+
+
+    /*
+       When Reset is clicked
+       and 17 rods are selected.
+    */
+
+    if (
+        columns === 17 &&
+        resetMode === true
+    ) {
+
+        return [
+            ...resetRodOrder
+        ];
+
+    }
+
+
+    /*
+       1 rod
+    */
+
+    if (
+        columns === 1
+    ) {
+
+        return [1];
+
+    }
+
+
+    /*
+       2, 3, 4
+       Reverse
+    */
+
+    if (
+        columns <= 4
+    ) {
+
+        const order = [];
+
+
+        for (
+            let i = columns;
+            i >= 1;
+            i--
+        ) {
+
+            order.push(i);
+
+        }
+
+
+        return order;
+
+    }
+
+
+    /*
+       5 to 17
+
+       4 3 2 1
+       5 6 7 8 ...
+    */
+
+    const order = [
+
+        4,
+        3,
+        2,
+        1
+
+    ];
+
+
+    for (
+        let i = 5;
+        i <= columns;
+        i++
+    ) {
+
+        order.push(i);
+
+    }
+
+
+    return order;
+
+}
+
+
+/* =========================================================
+   INITIALIZE STATE
+   ========================================================= */
+
+function initState() {
+
+    state = [];
+
+
+    for (
+        let i = 0;
+        i < columns;
+        i++
+    ) {
+
+        state.push({
+
+            upper: 0,
+
+            lower: 0
+
+        });
+
+    }
+
+}
+
+
+/* =========================================================
+   BUILD ABACUS
+   ========================================================= */
+
+function buildAbacus() {
+
+
+    const abacus =
+        document.getElementById(
+            'abacus'
+        );
+
+
+    if (!abacus) {
+
+        return;
+
+    }
+
+
+    abacus.innerHTML = '';
+
+
+    /*
+       Set number of grid columns
+       dynamically.
+    */
+
+    abacus.style.setProperty(
+        '--rod-count',
+        columns
+    );
+
+
+    const rodOrder =
+        getRodOrder();
+
+
+    /*
+       Upper
+    */
+
+    const upperContainer =
+        document.createElement(
+            'div'
+        );
+
+    upperContainer.className =
+        'upper-section-container';
+
+
+    /*
+       Divider
+    */
+
+    const dividerBar =
+        document.createElement(
+            'div'
+        );
+
+    dividerBar.className =
+        'divider-bar';
+
+
+    /*
+       Lower
+    */
+
+    const lowerContainer =
+        document.createElement(
+            'div'
+        );
+
+    lowerContainer.className =
+        'lower-section-container';
+
+
+    /*
+       Create rods
+    */
+
+    rodOrder.forEach(
+        function (
+            rodNumber,
+            displayIndex
+        ) {
+
+
+            /*
+               ----------------------------------
+               COLOR
+               ----------------------------------
+            */
+
+            const color =
+                beadColors[
+                    rodNumber - 1
+                ];
+
+
+            /*
+               ----------------------------------
+               UPPER COLUMN
+               ----------------------------------
+            */
+
+            const upperColumn =
+                document.createElement(
+                    'div'
+                );
+
+            upperColumn.className =
+                'upper-column';
+
+
+            upperColumn.dataset.col =
+                displayIndex;
+
+
+            upperColumn.dataset.rod =
+                rodNumber;
+
+
+            /*
+               Upper rod
+            */
+
+            const upperRod =
+                document.createElement(
+                    'div'
+                );
+
+            upperRod.className =
+                'rod';
+
+
+            upperColumn.appendChild(
+                upperRod
+            );
+
+
+            /*
+               Upper bead
+            */
+
+            const upperBead =
+                document.createElement(
+                    'div'
+                );
+
+            upperBead.className =
+                'bead';
+
+
+            upperBead.style.background =
+                color;
+
+
+            upperBead.dataset.col =
+                displayIndex;
+
+
+            upperBead.dataset.type =
+                'upper';
+
+
+            upperBead.dataset.rod =
+                rodNumber;
+
+
+            upperBead.addEventListener(
+                'click',
+                handleBeadClick
+            );
+
+
+            upperColumn.appendChild(
+                upperBead
+            );
+
+
+            upperContainer.appendChild(
+                upperColumn
+            );
+
+
+            /*
+               ----------------------------------
+               LOWER COLUMN
+               ----------------------------------
+            */
+
+            const lowerColumn =
+                document.createElement(
+                    'div'
+                );
+
+            lowerColumn.className =
+                'lower-column';
+
+
+            lowerColumn.dataset.col =
+                displayIndex;
+
+
+            lowerColumn.dataset.rod =
+                rodNumber;
+
+
+            /*
+               Lower rod
+            */
+
+            const lowerRod =
+                document.createElement(
+                    'div'
+                );
+
+            lowerRod.className =
+                'rod';
+
+
+            lowerColumn.appendChild(
+                lowerRod
+            );
+
+
+            /*
+               Four lower beads
+            */
+
+            for (
+                let b = 0;
+                b < 4;
+                b++
+            ) {
+
+                const bead =
+                    document.createElement(
+                        'div'
+                    );
+
+                bead.className =
+                    'bead';
+
+
+                bead.style.background =
+                    color;
+
+
+                bead.dataset.col =
+                    displayIndex;
+
+
+                bead.dataset.type =
+                    'lower';
+
+
+                bead.dataset.index =
+                    b;
+
+
+                bead.dataset.rod =
+                    rodNumber;
+
+
+                bead.addEventListener(
+                    'click',
+                    handleBeadClick
+                );
+
+
+                lowerColumn.appendChild(
+                    bead
+                );
+
+            }
+
+
+            lowerContainer.appendChild(
+                lowerColumn
+            );
+
+
+            /*
+               ----------------------------------
+               DIVIDER DOT
+               ----------------------------------
+
+               IMPORTANT:
+
+               Dot does NOT use rod number.
+
+               Dot uses display position.
+
+               Position from RIGHT:
+
+               3
+               6
+               9
+               12
+               15
+
+               Therefore it remains fixed
+               after every 3 DISPLAYED rods.
+            */
+
+            const marker =
+                document.createElement(
+                    'div'
+                );
+
+            marker.className =
+                'divider-marker';
+
+
+            const positionFromRight =
+                rodOrder.length -
+                displayIndex;
+
+
+            if (
+
+                positionFromRight === 3 ||
+
+                positionFromRight === 6 ||
+
+                positionFromRight === 9 ||
+
+                positionFromRight === 12 ||
+
+                positionFromRight === 15
+
+            ) {
+
+                marker.classList.add(
+                    'has-dot'
+                );
+
+            }
+
+
+            dividerBar.appendChild(
+                marker
+            );
+
+        }
+    );
+
+
+    /*
+       Add everything
+    */
+
+    abacus.appendChild(
+        upperContainer
+    );
+
+
+    abacus.appendChild(
+        dividerBar
+    );
+
+
+    abacus.appendChild(
+        lowerContainer
+    );
+
+
+    updateBeadPositions();
+
+
+}
+
+
+/* =========================================================
+   BEAD CLICK
+   ========================================================= */
+
+function handleBeadClick(event) {
+
+
+    const col =
+        parseInt(
+            event.currentTarget.dataset.col,
+            10
+        );
+
+
+    const type =
+        event.currentTarget.dataset.type;
+
+
+    /*
+       UPPER BEAD
+       = 5
+    */
+
+    if (
+        type === 'upper'
+    ) {
+
+        state[col].upper =
+            state[col].upper === 0
+                ? 1
+                : 0;
+
+    }
+
+
+    /*
+       LOWER BEAD
+       = 1 each
+    */
+
+    else {
+
+        const index =
+            parseInt(
+                event.currentTarget.dataset.index,
+                10
+            );
+
+
+        const current =
+            state[col].lower;
+
+
+        if (
+            index < current
+        ) {
+
+            state[col].lower =
+                index;
+
+        }
+
+        else {
+
+            state[col].lower =
+                index + 1;
+
+        }
+
+    }
+
+
+    updateBeadPositions();
+
+
+}
+
+
+/* =========================================================
+   UPDATE BEAD POSITIONS
+   ========================================================= */
+
+function updateBeadPositions() {
+
+
+    /*
+       UPPER
+    */
+
+    const upperColumns =
+        document.querySelectorAll(
+            '.upper-column'
+        );
+
+
+    upperColumns.forEach(
+        function (
+            columnElement,
+            index
+        ) {
+
+
+            const bead =
+                columnElement.querySelector(
+                    '.bead'
+                );
+
+
+            if (
+                state[index].upper === 1
+            ) {
+
+                bead.classList.add(
+                    'active'
+                );
+
+            }
+
+            else {
+
+                bead.classList.remove(
+                    'active'
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+       LOWER
+    */
+
+    const lowerColumns =
+        document.querySelectorAll(
+            '.lower-column'
+        );
+
+
+    lowerColumns.forEach(
+        function (
+            columnElement,
+            columnIndex
+        ) {
+
+
+            const beads =
+                columnElement.querySelectorAll(
+                    '.bead'
+                );
+
+
+            beads.forEach(
+                function (
+                    bead,
+                    beadIndex
+                ) {
+
+
+                    if (
+                        beadIndex <
+                        state[columnIndex].lower
+                    ) {
+
+                        bead.classList.add(
+                            'active'
+                        );
+
+                    }
+
+                    else {
+
+                        bead.classList.remove(
+                            'active'
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RESET
+   =========================================================
+
+   RESET ALWAYS:
+
+   Rods = 17
+
+   Order:
+
+   15 14 10 9 8
+   4 3 2 1
+   5 6 7
+   11 12 13
+   16 17
+   */
+
+function resetAbacus() {
+
+
+    columns = 17;
+
+    resetMode = true;
+
+
+    const rodCount =
+        document.getElementById(
+            'rodCount'
+        );
+
+
+    if (
+        rodCount
+    ) {
+
+        rodCount.value = 17;
+
+    }
+
+
+    initState();
+
+    buildAbacus();
+
+}
+
+
+/* =========================================================
+   CLEAR RODS
+   =========================================================
+
+   IMPORTANT:
+
+   This DOES NOT change rod count.
+
+   Example:
+
+   Rod count = 1
+
+   User moves 2 lower beads.
+
+   Clear Rods
+
+   Result:
+
+   Rod count remains 1.
+
+   All beads become clear.
+   */
+
+function clearRods() {
+
+
+    /*
+       Keep current columns.
+    */
+
+    for (
+        let i = 0;
+        i < state.length;
+        i++
+    ) {
+
+        state[i].upper = 0;
+
+        state[i].lower = 0;
+
+    }
+
+
+    updateBeadPositions();
+
+
+}
+
+
+/* =========================================================
+   ROD COUNT CHANGE
+   ========================================================= */
+
+function handleRodCountChange() {
+
+
+    const input =
+        document.getElementById(
+            'rodCount'
+        );
+
+
+    if (!input) {
+
+        return;
+
+    }
+
+
+    let newCount =
+        parseInt(
+            input.value,
+            10
+        );
+
+
+    if (
+        isNaN(newCount)
+    ) {
+
+        newCount = 1;
+
+    }
+
+
+    if (
+        newCount < 1
+    ) {
+
+        newCount = 1;
+
+    }
+
+
+    if (
+        newCount > 17
+    ) {
+
+        newCount = 17;
+
+    }
+
+
+    input.value =
+        newCount;
+
+
+    columns =
+        newCount;
+
+
+    /*
+       Manual rod selection.
+
+       Even if 17 is manually entered,
+       it will use normal order:
+
+       4 3 2 1
+       5 6 7 ... 17
+    */
+
+    resetMode = false;
+
+
+    initState();
+
+    buildAbacus();
+
+}
+
+
+/* =========================================================
+   HIDE HEADER
+   ========================================================= */
+
+function hideHeader() {
+
+
+    const header =
+        document.getElementById(
+            'mainHeader'
+        );
+
+
+    const hideButton =
+        document.getElementById(
+            'hideHeaderBtn'
+        );
+
+
+    const showButton =
+        document.getElementById(
+            'showHeaderBtn'
+        );
+
+
+    if (
+        header
+    ) {
+
+        header.classList.add(
+            'header-hidden'
+        );
+
+    }
+
+
+    if (
+        hideButton
+    ) {
+
+        hideButton.style.display =
+            'none';
+
+    }
+
+
+    if (
+        showButton
+    ) {
+
+        showButton.style.display =
+            'inline-block';
+
+    }
+
+
+    document.body.classList.add(
+        'header-hidden-mode'
+    );
+
+}
+
+
+/* =========================================================
+   SHOW HEADER
+   ========================================================= */
+
+function showHeader() {
+
+
+    const header =
+        document.getElementById(
+            'mainHeader'
+        );
+
+
+    const hideButton =
+        document.getElementById(
+            'hideHeaderBtn'
+        );
+
+
+    const showButton =
+        document.getElementById(
+            'showHeaderBtn'
+        );
+
+
+    if (
+        header
+    ) {
+
+        header.classList.remove(
+            'header-hidden'
+        );
+
+    }
+
+
+    if (
+        hideButton
+    ) {
+
+        hideButton.style.display =
+            'inline-block';
+
+    }
+
+
+    if (
+        showButton
+    ) {
+
+        showButton.style.display =
+            'none';
+
+    }
+
+
+    document.body.classList.remove(
+        'header-hidden-mode'
+    );
+
+}
+
+
+/* =========================================================
+   OPEN SCHOOL PDF
+   ========================================================= */
+
+function openSchoolPdf() {
+        window.location.href =
+         '1st_Level_class_Book.pdf';
+
+}
+
+
+/* =========================================================
+   PAGE LOAD
+   ========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+
+        /*
+           Default:
+
+           17 rods
+        */
+
+        columns = 17;
+
+        resetMode = true;
+
+
+        initState();
+
+        buildAbacus();
+
+
+        /*
+           Reset
+        */
+
+        const resetBtn =
+            document.getElementById(
+                'resetBtn'
+            );
+
+
+        if (
+            resetBtn
+        ) {
+
+            resetBtn.addEventListener(
+                'click',
+                resetAbacus
+            );
+
+        }
+
+
+        /*
+           Clear Rods
+        */
+
+        const clearBtn =
+            document.getElementById(
+                'clearBtn'
+            );
+
+
+        if (
+            clearBtn
+        ) {
+
+            clearBtn.addEventListener(
+                'click',
+                clearRods
+            );
+
+        }
+
+
+        /*
+           Rod Count
+        */
+
+        const rodCount =
+            document.getElementById(
+                'rodCount'
+            );
+
+
+        if (
+            rodCount
+        ) {
+
+            rodCount.addEventListener(
+                'change',
+                handleRodCountChange
+            );
+
+
+            /*
+               Also support Enter key.
+            */
+
+            rodCount.addEventListener(
+                'keydown',
+                function (event) {
+
+                    if (
+                        event.key === 'Enter'
+                    ) {
+
+                        handleRodCountChange();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /*
+           Hide Header
+        */
+
+        const hideHeaderBtn =
+            document.getElementById(
+                'hideHeaderBtn'
+            );
+
+
+        if (
+            hideHeaderBtn
+        ) {
+
+            hideHeaderBtn.addEventListener(
+                'click',
+                hideHeader
+            );
+
+        }
+
+
+        /*
+           Show Header
+        */
+
+        const showHeaderBtn =
+            document.getElementById(
+                'showHeaderBtn'
+            );
+
+
+        if (
+            showHeaderBtn
+        ) {
+
+            showHeaderBtn.addEventListener(
+                'click',
+                showHeader
+            );
+
+        }
+
+    }
+
+);
+
+</script>
+
+</body>
+
+</html>
